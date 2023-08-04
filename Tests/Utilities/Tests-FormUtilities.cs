@@ -1,6 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Web.UI;
+using System.Web.UI.HtmlControls;
+using System.Web.UI.WebControls;
 using WebApplicationFormToObject.Utilities;
 
 namespace Tests.Utilities
@@ -17,6 +19,8 @@ namespace Tests.Utilities
             _sut = new FormUtilities();
         }
 
+
+        #region FindControl Tests
 
         [TestMethod]
         public void FindControl_ReturnsExpectedControl_WhenControlExists()
@@ -127,6 +131,267 @@ namespace Tests.Utilities
             Assert.AreEqual(child2, result, $"Expected control with ID: {child2.ID}. Found control with ID: {result?.ID}");
         }
 
+        #endregion
 
+
+        #region SetControlValue Tests
+
+        [TestMethod]
+        public void SetControlValue_SetValueToTextBox_ControlUpdated()
+        {
+            // Arrange
+            var control = new TextBox();
+
+            // Act
+            _sut.SetControlValue(control, "testValue", false, false);
+
+            // Assert
+            Assert.AreEqual("testValue", (control as TextBox).Text);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToTextBoxWithIgnoreStrings_ControlNotUpdated()
+        {
+            // Arrange
+            var control = new TextBox();
+
+            // Act
+            _sut.SetControlValue(control, "testValue", false, true);
+
+            // Assert
+            Assert.AreEqual(string.Empty, (control as TextBox).Text);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToLiteral_ControlUpdated()
+        {
+            // Arrange
+            var control = new Literal();
+
+            // Act
+            _sut.SetControlValue(control, "testValue", false, false);
+
+            // Assert
+            Assert.AreEqual("testValue", (control as Literal).Text);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToLinkButton_ControlUpdatedAndVisible()
+        {
+            // Arrange
+            var control = new LinkButton();
+
+            // Act
+            _sut.SetControlValue(control, "testValue", false, false);
+
+            // Assert
+            Assert.AreEqual("testValue", (control as LinkButton).CommandArgument);
+            Assert.IsTrue((control as LinkButton).Visible);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToLinkButtonWithLock_ControlNotVisible()
+        {
+            // Arrange
+            var control = new LinkButton();
+
+            // Act
+            _sut.SetControlValue(control, "testValue", true, false);
+
+            // Assert
+            Assert.IsFalse((control as LinkButton).Visible);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToButton_ControlUpdated()
+        {
+            // Arrange
+            var control = new Button();
+
+            // Act
+            _sut.SetControlValue(control, "testValue", false, false);
+
+            // Assert
+            Assert.AreEqual("testValue", (control as Button).Text);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToImage_ControlUpdated()
+        {
+            // Arrange
+            var control = new Image();
+
+            // Act
+            _sut.SetControlValue(control, "imageUrl.jpg", false, false);
+
+            // Assert
+            Assert.AreEqual("imageUrl.jpg", (control as Image).ImageUrl);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToCheckBox_ControlUpdated()
+        {
+            // Arrange
+            var control = new CheckBox();
+
+            // Act
+            _sut.SetControlValue(control, true, false, false);
+
+            // Assert
+            Assert.IsTrue((control as CheckBox).Checked);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToDropDownListBooleanValue_ControlUpdated()
+        {
+            // Arrange
+            var control = new DropDownList();
+            control.Items.Add(new ListItem("True", "1"));
+            control.Items.Add(new ListItem("False", "0"));
+
+            // Act
+            _sut.SetControlValue(control, true, false, false);
+
+            // Assert
+            Assert.AreEqual("1", (control as DropDownList).SelectedValue);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToDropDownListStringValue_ControlUpdated()
+        {
+            // Arrange
+            var control = new DropDownList();
+            control.Items.Add(new ListItem("Option 1", "Option1"));
+            control.Items.Add(new ListItem("Option 2", "Option2"));
+
+            // Act
+            _sut.SetControlValue(control, "Option1", false, false);
+
+            // Assert
+            Assert.AreEqual("Option1", (control as DropDownList).SelectedValue);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToRadioButtonList_ControlUpdated()
+        {
+            // Arrange
+            var control = new RadioButtonList();
+            control.Items.Add("Option1");
+            control.Items.Add("Option2");
+
+            // Act
+            _sut.SetControlValue(control, "Option1", false, false);
+
+            // Assert
+            Assert.AreEqual("Option1", (control as RadioButtonList).SelectedValue);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToHiddenField_ControlUpdated()
+        {
+            // Arrange
+            var control = new HiddenField();
+
+            // Act
+            _sut.SetControlValue(control, "hiddenValue", false, false);
+
+            // Assert
+            Assert.AreEqual("hiddenValue", (control as HiddenField).Value);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToHtmlRadioButton_Checked()
+        {
+            // Arrange
+            var control = new RadioButtonList();
+
+            // Act
+            _sut.SetControlValue(control, "test", false, false);
+
+            // Assert
+            Assert.AreEqual("test", control.SelectedValue);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToCheckBox_Checked()
+        {
+            // Arrange
+            var control = new CheckBox();
+            control.Checked = true;
+
+            // Act
+            _sut.SetControlValue(control, "true", false, false);
+
+            // Assert
+            Assert.IsTrue(control.Checked);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToGeneralHtmlControl_ValueSet()
+        {
+            // Arrange
+            var control = new HtmlGenericControl("span");
+
+            // Act
+            _sut.SetControlValue(control, "valueHere", false, false);
+
+            // Assert
+            Assert.AreEqual("valueHere", control.Attributes["value"]);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToHtmlControlWithLock_Disabled()
+        {
+            // Arrange
+            var control = new HtmlInputText();
+
+            // Act
+            _sut.SetControlValue(control, "inputValue", true, false);
+
+            // Assert
+            Assert.IsFalse(control.Disabled);
+        }
+
+        [TestMethod]
+        public void SetControlValue_SetValueToHtmlControlTextbox_ControlUpdated()
+        {
+            // Arrange
+            var control = new HtmlInputText();
+
+            // Act
+            _sut.SetControlValue(control, "inputValue", false, false);
+
+            // Assert
+            Assert.AreEqual("inputValue", (control as HtmlInputText).Value);
+        }
+
+
+        [TestMethod]
+        public void SetControlValue_LockWebControl_WebControlDisabled()
+        {
+            // Arrange
+            var control = new TextBox();
+
+            // Act
+            _sut.SetControlValue(control, "testValue", true, false);
+
+            // Assert
+            Assert.IsFalse((control as WebControl).Enabled);
+        }
+
+        [TestMethod]
+        public void SetControlValue_UnlockWebControl_WebControlEnabled()
+        {
+            // Arrange
+            var control = new TextBox();
+
+            // Act
+            _sut.SetControlValue(control, "testValue", false, false);
+
+            // Assert
+            Assert.IsTrue((control as WebControl).Enabled);
+        }
+
+        #endregion
     }
 }
