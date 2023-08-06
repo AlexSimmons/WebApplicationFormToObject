@@ -64,36 +64,64 @@ namespace WebApplicationFormToObject.Utilities
 
             var stringValue = value.ToString();
 
+            // Handle properties common to all WebControls
+            if (control is WebControl webControl)
+            {
+                webControl.Enabled = !lockFields;
+            }
+
+            // TextBox control
             if (control is TextBox textBox && !ignoreStrings)
             {
                 textBox.Text = stringValue;
+                return;
             }
-            else if (control is Label label)
+
+            // Label control
+            if (control is Label label)
             {
                 label.Text = stringValue;
+                return;
             }
-            else if (control is Literal literal)
+
+            // Literal control
+            if (control is Literal literal)
             {
                 literal.Text = stringValue;
+                return;
             }
-            else if (control is LinkButton linkButton)
+
+            // LinkButton control
+            if (control is LinkButton linkButton)
             {
                 linkButton.CommandArgument = stringValue;
                 linkButton.Visible = !lockFields;
+                return;
             }
-            else if (control is Button button)
+
+            // Button control
+            if (control is Button button)
             {
                 button.Text = stringValue;
+                return;
             }
-            else if (control is Image image)
+
+            // Image control
+            if (control is Image image)
             {
                 image.ImageUrl = stringValue;
+                return;
             }
-            else if (control is CheckBox checkBox)
+
+            // CheckBox control
+            if (control is CheckBox checkBox)
             {
                 checkBox.Checked = Convert.ToBoolean(value);
+                return;
             }
-            else if (control is DropDownList dropDownList)
+
+            // DropDownList control
+            if (control is DropDownList dropDownList)
             {
                 if (value is bool booleanValue)
                 {
@@ -103,8 +131,11 @@ namespace WebApplicationFormToObject.Utilities
                 {
                     dropDownList.SelectedValue = stringValue;
                 }
+                return;
             }
-            else if (control is RadioButtonList radioButtonList)
+
+            // RadioButtonList control
+            if (control is RadioButtonList radioButtonList)
             {
                 foreach (ListItem item in radioButtonList.Items)
                 {
@@ -114,12 +145,18 @@ namespace WebApplicationFormToObject.Utilities
                         break;
                     }
                 }
+                return;
             }
-            else if (control is HiddenField hiddenField)
+
+            // HiddenField control
+            if (control is HiddenField hiddenField)
             {
                 hiddenField.Value = stringValue;
+                return;
             }
-            else if (control is HtmlControl htmlControl)
+
+            // HtmlControl (with radio and checkbox specifics)
+            if (control is HtmlControl htmlControl)
             {
                 htmlControl.Attributes["value"] = stringValue;
 
@@ -128,11 +165,7 @@ namespace WebApplicationFormToObject.Utilities
                 {
                     SetRadioCheckboxAttribute(control);
                 }
-            }
-
-            if (control is WebControl webControl)
-            {
-                webControl.Enabled = !lockFields;
+                return;
             }
         }
 
