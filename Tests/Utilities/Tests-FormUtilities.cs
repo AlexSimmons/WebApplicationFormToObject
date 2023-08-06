@@ -176,6 +176,24 @@ namespace Tests.Utilities
         }
 
         [TestMethod]
+        public void SetControlValue_SetValueToRadioButtonList_SelectedCorrectly()
+        {
+            // Arrange
+            RadioButtonList radioButtonList = new RadioButtonList();
+            radioButtonList.Items.Add(new ListItem("Option1"));
+            radioButtonList.Items.Add(new ListItem("Option2"));
+            radioButtonList.Items.Add(new ListItem("Option3"));
+
+            string expectedValue = "Option2";
+
+            // Act
+            _sut.SetControlValue(radioButtonList, expectedValue, false, false);
+
+            // Assert
+            Assert.IsTrue(radioButtonList.Items.FindByText(expectedValue).Selected);
+        }
+
+        [TestMethod]
         public void SetControlValue_SetValueToLinkButton_ControlUpdatedAndVisible()
         {
             // Arrange
@@ -297,19 +315,6 @@ namespace Tests.Utilities
 
             // Assert
             Assert.AreEqual("hiddenValue", (control as HiddenField).Value);
-        }
-
-        [TestMethod]
-        public void SetControlValue_SetValueToHtmlRadioButton_Checked()
-        {
-            // Arrange
-            var control = new RadioButtonList();
-
-            // Act
-            _sut.SetControlValue(control, "test", false, false);
-
-            // Assert
-            Assert.AreEqual("test", control.SelectedValue);
         }
 
         [TestMethod]

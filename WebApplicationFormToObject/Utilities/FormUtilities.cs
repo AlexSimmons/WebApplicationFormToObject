@@ -106,7 +106,14 @@ namespace WebApplicationFormToObject.Utilities
             }
             else if (control is RadioButtonList radioButtonList)
             {
-                radioButtonList.SelectedValue = stringValue;
+                foreach (ListItem item in radioButtonList.Items)
+                {
+                    if (item.Value == stringValue)
+                    {
+                        item.Selected = true;
+                        break;
+                    }
+                }
             }
             else if (control is HiddenField hiddenField)
             {
