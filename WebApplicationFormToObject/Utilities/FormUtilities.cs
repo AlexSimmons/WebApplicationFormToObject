@@ -175,7 +175,7 @@ namespace WebApplicationFormToObject.Utilities
         /// If the attribute already exists, it updates its value; otherwise, it adds the attribute.
         /// </summary>
         /// <param name="control">The control whose "checked" attribute needs to be set or added.</param>
-        private void SetRadioCheckboxAttribute(Control control)
+        public void SetRadioCheckboxAttribute(Control control)
         {
             var htmlControl = control as HtmlControl;
             if (htmlControl == null) return;
@@ -228,11 +228,21 @@ namespace WebApplicationFormToObject.Utilities
                     return checkBox.Checked;
 
                 case DropDownList dropDownList:
-                    // Note: Using the HttpContext in this manner tightly couples this method to web-related operations. Consider refactoring if this method should be unit testable or usable outside a web context.
-                    return HttpContext.Current.Request.Form[dropDownList.UniqueID];
+                    return dropDownList.SelectedValue;
 
                 case RadioButtonList radioButtonList:
-                    return radioButtonList.SelectedValue;
+
+                    var selectedText = "";
+                    foreach (ListItem item in radioButtonList.Items)
+                    {
+                        if (item.Selected)
+                        {
+                            selectedText = item.Text;
+                            break;
+                        }
+                    }
+
+                    return selectedText;
 
                 case HiddenField hiddenField:
                     return hiddenField.Value;

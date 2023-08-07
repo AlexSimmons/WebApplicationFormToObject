@@ -93,7 +93,5 @@ namespace WebApplicationFormToObject.Utilities
             // Handle cases where the value string is empty or null
             return (type.Name == "Nullable`1") ? null : string.Empty;
         }
-
-
     }
 }

@@ -398,5 +398,192 @@ namespace Tests.Utilities
         }
 
         #endregion
+
+
+        #region SetRadioCheckboxAttribute
+
+        [TestMethod]
+        public void SetRadioCheckboxAttribute_SettingAttributeToChecked_WhenAttributeExists()
+        {
+            // Arrange
+            HtmlControl control = new HtmlGenericControl("div");
+            control.Attributes.Add("checked", "false");
+
+            // Act
+            _sut.SetRadioCheckboxAttribute(control);
+
+            // Assert
+            Assert.AreEqual("true", control.Attributes["checked"]);
+        }
+
+        [TestMethod]
+        public void SetRadioCheckboxAttribute_AddingAttributeChecked_WhenAttributeDoesNotExist()
+        {
+            // Arrange
+            HtmlControl control = new HtmlGenericControl("div");
+
+            // Act
+            _sut.SetRadioCheckboxAttribute(control);
+
+            // Assert
+            Assert.AreEqual("true", control.Attributes["checked"]);
+        }
+
+        #endregion
+
+        #region GetValue
+
+        [TestMethod]
+        public void GetValue_ReturnsTextBoxText()
+        {
+            // Arrange
+            TextBox textBox = new TextBox { Text = "TestText" };
+
+            // Act
+            var result = _sut.GetValue(textBox);
+
+            // Assert
+            Assert.AreEqual(textBox.Text, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsLabelText()
+        {
+            // Arrange
+            Label label = new Label { Text = "TestLabel" };
+
+            // Act
+            var result = _sut.GetValue(label);
+
+            // Assert
+            Assert.AreEqual(label.Text, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsLiteralText()
+        {
+            // Arrange
+            Literal literal = new Literal { Text = "TestLiteral" };
+
+            // Act
+            var result = _sut.GetValue(literal);
+
+            // Assert
+            Assert.AreEqual(literal.Text, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsLinkButtonText()
+        {
+            // Arrange
+            LinkButton linkButton = new LinkButton { Text = "TestLinkButton" };
+
+            // Act
+            var result = _sut.GetValue(linkButton);
+
+            // Assert
+            Assert.AreEqual(linkButton.Text, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsButtonText()
+        {
+            // Arrange
+            Button button = new Button { Text = "TestButton" };
+
+            // Act
+            var result = _sut.GetValue(button);
+
+            // Assert
+            Assert.AreEqual(button.Text, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsImageUrl()
+        {
+            // Arrange
+            Image image = new Image { ImageUrl = "TestImageUrl" };
+
+            // Act
+            var result = _sut.GetValue(image);
+
+            // Assert
+            Assert.AreEqual(image.ImageUrl, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsCheckBoxValue()
+        {
+            // Arrange
+            CheckBox checkBox = new CheckBox { Checked = true };
+
+            // Act
+            var result = _sut.GetValue(checkBox);
+
+            // Assert
+            Assert.AreEqual(checkBox.Checked, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsDropDownListValue()
+        {
+            // Arrange
+            DropDownList dropDownList = new DropDownList();
+            dropDownList.Items.Add(new ListItem("Test1", "1"));
+            dropDownList.Items.Add(new ListItem("Test2", "2"));
+            dropDownList.Items[0].Selected = true;
+
+            // Act
+            var result = _sut.GetValue(dropDownList);
+
+            // Assert
+            Assert.AreEqual(dropDownList.Items[0].Value, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsRadioButtonListValue()
+        {
+            // Arrange
+            RadioButtonList radioButtonList = new RadioButtonList();
+            radioButtonList.Items.Add(new ListItem("Test1", "1"));
+            radioButtonList.Items.Add(new ListItem("Test2", "2"));
+            radioButtonList.Items[1].Selected = true;
+
+            // Act
+            var result = _sut.GetValue(radioButtonList);
+
+            // Assert
+            Assert.AreEqual(radioButtonList.Items[1].Text, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsHiddenFieldValue()
+        {
+            // Arrange
+            HiddenField hiddenField = new HiddenField { Value = "TestHiddenField" };
+
+            // Act
+            var result = _sut.GetValue(hiddenField);
+
+            // Assert
+            Assert.AreEqual(hiddenField.Value, result);
+        }
+
+        [TestMethod]
+        public void GetValue_ReturnsNullForUnsupportedControlType()
+        {
+            // Arrange
+            Panel panel = new Panel(); // Unsupported control
+
+            // Act
+            var result = _sut.GetValue(panel);
+
+            // Assert
+            Assert.IsNull(result);
+        }
+
+        #endregion
+
     }
+
 }
