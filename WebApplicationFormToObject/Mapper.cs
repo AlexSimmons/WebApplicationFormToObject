@@ -12,7 +12,7 @@ namespace WebApplicationFormToObject
 {
     public class Mapper
     {
-        private static readonly string controlNameEndFormatting = "_{0}";
+        public readonly string controlNameEndFormatting = "_{0}";
 
         private FormUtilities _formUtilities;
         private ConversionUtilities _conversionUtilities;
@@ -23,6 +23,13 @@ namespace WebApplicationFormToObject
             _formUtilities = formUtilities ?? new FormUtilities();
             _conversionUtilities = conversionUtilities ?? new ConversionUtilities();
             _propertyUtilities = propertyUtilities ?? new PropertyUtilities();
+        }
+
+        public Mapper()
+        {
+            _formUtilities = new FormUtilities();
+            _conversionUtilities = new ConversionUtilities();   
+            _propertyUtilities = new PropertyUtilities();
         }
 
 
