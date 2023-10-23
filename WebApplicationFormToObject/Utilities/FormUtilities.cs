@@ -10,6 +10,13 @@ namespace WebApplicationFormToObject.Utilities
 {
     public class FormUtilities
     {
+        private readonly Queue<Control> _controlQueue;
+
+        public FormUtilities() 
+        { 
+            _controlQueue = new Queue<Control>();
+        }
+
         /// <summary>
         /// breadth-first search of controls.
         /// </summary>
@@ -23,12 +30,11 @@ namespace WebApplicationFormToObject.Utilities
                 return null;
             }
 
-            Queue<Control> controlQueue = new Queue<Control>();
-            controlQueue.Enqueue(root);
+            _controlQueue.Enqueue(root);
 
-            while (controlQueue.Count > 0)
+            while (_controlQueue.Count > 0)
             {
-                var currentControl = controlQueue.Dequeue();
+                var currentControl = _controlQueue.Dequeue();
 
                 if (currentControl.ID?.EndsWith(id) == true)
                 {
@@ -37,7 +43,7 @@ namespace WebApplicationFormToObject.Utilities
 
                 foreach (Control child in currentControl.Controls)
                 {
-                    controlQueue.Enqueue(child);
+                    _controlQueue.Enqueue(child);
                 }
             }
 
@@ -251,7 +257,5 @@ namespace WebApplicationFormToObject.Utilities
                     return null;
             }
         }
-
-
     }
 }

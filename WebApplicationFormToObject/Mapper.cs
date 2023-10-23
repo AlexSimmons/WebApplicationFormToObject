@@ -10,25 +10,18 @@ using WebApplicationFormToObject.Utilities;
 
 namespace WebApplicationFormToObject
 {
-    public class Mapper
+    public class Mapper : IMapper
     {
         public readonly string controlNameEndFormatting = "_{0}";
 
-        private FormUtilities _formUtilities;
-        private ConversionUtilities _conversionUtilities;
-        private PropertyUtilities _propertyUtilities;
-
-        public Mapper(FormUtilities formUtilities, ConversionUtilities conversionUtilities, PropertyUtilities propertyUtilities)
-        {
-            _formUtilities = formUtilities ?? new FormUtilities();
-            _conversionUtilities = conversionUtilities ?? new ConversionUtilities();
-            _propertyUtilities = propertyUtilities ?? new PropertyUtilities();
-        }
+        private readonly FormUtilities _formUtilities;
+        private readonly ConversionUtilities _conversionUtilities;
+        private readonly PropertyUtilities _propertyUtilities;
 
         public Mapper()
         {
             _formUtilities = new FormUtilities();
-            _conversionUtilities = new ConversionUtilities();   
+            _conversionUtilities = new ConversionUtilities();
             _propertyUtilities = new PropertyUtilities();
         }
 
@@ -45,12 +38,13 @@ namespace WebApplicationFormToObject
             if (form == null || objectToLoad == null) return;
 
             // 1) Get a list of the properties of the object.
-            PropertyInfo[] properties = _propertyUtilities.GetProperties(objectToLoad);
+            var properties = _propertyUtilities.GetProperties(objectToLoad);
 
             // 2) Loop through each property looking for a control on the form with the same name
             foreach (PropertyInfo property in properties)
             {
-                Control control = _formUtilities.FindControl(form, string.Format(controlNameEndFormatting, property.Name));
+                var controlName = string.Format(controlNameEndFormatting, property.Name);
+                var control = _formUtilities.FindControl(form, controlName);
                 if (control != null)
                 {
                     _formUtilities.SetControlValue(control, _conversionUtilities.GetValueToLoad(property, objectToLoad), lockFields, ignoreStrings);
@@ -71,41 +65,49 @@ namespace WebApplicationFormToObject
             if (form == null || objectToSave == null) return true;
 
             var errors = new NameValueCollection();
-
-            // 1) Get a list of the properties of the object.
             var properties = _propertyUtilities.GetProperties(objectToSave);
 
-            // 2) Loop through each property looking for a control on the form with the same name
-            foreach (PropertyInfo property in properties)
+            foreach (var property in properties)
             {
-                if (property.GetSetMethod() != null)
+                if (TryGetControlForProperty(form, property, out var control))
                 {
-                    var control = _formUtilities.FindControl(form, string.Format(controlNameEndFormatting, property.Name));
-                    if (control != null)
-                    {
-                        try
-                        {
-                            var valueOfControl = _formUtilities.GetValue(control);
-                            if (valueOfControl != null)
-                            {
-                                var valueToSave = _conversionUtilities.ConvertValueToPropertyType(valueOfControl, property.PropertyType, allowNullableParameter);
-
-                                if (allowNullableParameter || valueToSave != null)
-                                {
-                                    property.SetValue(objectToSave, valueToSave, null);
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            errors.Add(control.ID, ex.Message);
-                        }
-                    }
+                    TrySetValueFromControlToProperty(control, property, objectToSave, allowNullableParameter, errors);
                 }
             }
 
-            return (errors.Count == 0);
+            return errors.Count == 0;
         }
 
+        private bool TryGetControlForProperty(HtmlForm form, PropertyInfo property, out Control control)
+        {
+            control = null;
+
+            if (property.GetSetMethod() == null) return false;
+
+            var controlName = string.Format(controlNameEndFormatting, property.Name);
+            control = _formUtilities.FindControl(form, controlName);
+
+            return control != null;
+        }
+
+        private void TrySetValueFromControlToProperty(Control control, PropertyInfo property, object objectToSave, bool allowNullableParameter, NameValueCollection errors)
+        {
+            try
+            {
+                var valueOfControl = _formUtilities.GetValue(control);
+                if (valueOfControl == null) return;
+
+                var valueToSave = _conversionUtilities.ConvertValueToPropertyType(valueOfControl, property.PropertyType, allowNullableParameter);
+
+                if (allowNullableParameter || valueToSave != null)
+                {
+                    property.SetValue(objectToSave, valueToSave);
+                }
+            }
+            catch (Exception ex)
+            {
+                errors.Add(control.ID, ex.Message);
+            }
+        }
     }
 }
